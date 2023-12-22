@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty in AI-generated Architecture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        #image-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        img {
+            width: 45%; /* Adjust the width based on your preference */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        img:hover {
+            transform: scale(1.1);
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background-color: #000;
+            border-radius: 8px;
+            transition: width 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h1>Beauty in AI-generated Architecture</h1>
+    <h2>Select the more beautiful building</h2>
+    <div id="image-container"></div>
+    <div id="progress-bar">
+        <div id="progress-fill"></div>
+    </div>
+</div>
+
+<script>
+    const subsets = [
+        [
+            { id: 'simple_1_1', url: 'https://cdn.midjourney.com/28092d83-3f7c-4507-80dd-ea8c6a313089/0_0.webp', type: 'simple' },
+            { id: 'simple_1_2', url: 'https://cdn.midjourney.com/cdf700af-19c3-4f46-a727-2ace786f9a91/0_0.webp', type: 'simple' },
+            { id: 'complex_1_3', url: 'https://cdn.midjourney.com/65738063-8225-4160-9070-c075e353b751/0_2.webp', type: 'complex' },
+            { id: 'complex_1_4', url: 'https://cdn.midjourney.com/a56535ca-255c-4681-9320-826d3ed09d62/0_0.webp', type: 'complex' }
+        ],
+        [
+            { id: 'simple_2_1', url: 'https://cdn.midjourney.com/4cae0dc3-32d9-43e0-bc63-c0b08619b7cd/0_2.webp', type: 'simple' },
+            { id: 'simple_2_2', url: 'https://cdn.midjourney.com/b7ed218f-5f90-4309-beb9-6a3dedd8194d/0_1.webp', type: 'simple' },
+            { id: 'complex_2_3', url: 'https://cdn.midjourney.com/660a26f6-fc94-497c-b241-8b2625dc72b0/0_2.webp', type: 'complex' },
+            { id: 'complex_2_4', url: 'https://cdn.midjourney.com/a077daed-3243-40ff-9e53-d22a966bcfea/0_0.webp', type: 'complex' }
+        ],
+    	[
+            { id: 'simple_3_1', url: 'https://cdn.midjourney.com/9f5ef628-d6ed-41da-88f5-7a1d287d1205/0_1.webp', type: 'simple' },
+            { id: 'simple_3_2', url: 'https://cdn.midjourney.com/46474bcc-0536-469f-bb08-06c45f81e7b2/0_1.webp', type: 'simple' },
+            { id: 'complex_3_3', url: 'https://cdn.midjourney.com/4c92b508-17f2-4e38-b311-f1e66cfd58ff/0_2.webp', type: 'complex' },
+            { id: 'complex_3_4', url: 'https://cdn.midjourney.com/542df455-e5d4-44fe-8769-57e92cc1bd47/0_0.webp', type: 'complex' }
+        ],
+   	[
+            { id: 'simple_4_1', url: 'https://cdn.midjourney.com/997607b3-4260-468c-b04b-c9a14b7bf8df/0_3.webp', type: 'simple' },
+            { id: 'simple_4_2', url: 'https://cdn.midjourney.com/f057ce20-c680-4067-b604-7314bed9a850/0_2.webp', type: 'simple' },
+            { id: 'complex_4_3', url: 'https://cdn.midjourney.com/c7c229eb-77ce-4a1f-a6eb-7c74debf80e4/0_1.webp', type: 'complex' },
+            { id: 'complex_4_4', url: 'https://cdn.midjourney.com/b57eee82-a820-4e7e-ab5b-bf059f10e46c/0_3.webp', type: 'complex' }
+        ],
+    ];
+
+    const images = generateImages(subsets);
+    const shuffledPairs = generateShuffledPairs(images);
+
+    let currentPairIndex = 0;
+
+    function showNextImagePair() {
+        const imageContainer = document.getElementById('image-container');
+        const [image1, image2] = shuffledPairs[currentPairIndex];
+
+        // Display the two selected images
+        imageContainer.innerHTML = `
+            <img src="${image1.url}" alt="Image 1" onclick="recordPreference('${image1.id}')">
+            <img src="${image2.url}" alt="Image 2" onclick="recordPreference('${image2.id}')">
+        `;
+    }
+
+    function recordPreference(selectedImageId) {
+        console.log(`Participant selected ${selectedImageId} as the more beautiful building`);
+
+        // Implement further logic based on your needs
+
+        currentPairIndex++;
+        if (currentPairIndex >= shuffledPairs.length) {
+            alert('Experiment complete!');
+        } else {
+            showNextImagePair();
+        }
+    }
+
+    function generateImages(subsets) {
+        const images = [];
+
+        subsets.forEach((subset, subsetIndex) => {
+            subset.forEach(image => {
+                images.push({
+                    id: image.id,
+                    url: image.url,
+                    type: image.type,
+                });
+            });
+        });
+
+        return images;
+    }
+
+    function generateShuffledPairs(images) {
+        const pairs = [];
+
+        for (let i = 0; i < images.length; i++) {
+            for (let j = i + 1; j < images.length; j++) {
+                const isSameSubset = images[i].id.split('_')[1] === images[j].id.split('_')[1];
+                const isSameType = images[i].type === images[j].type;
+
+                // Ensure images in the same subset or of the same type are never compared
+                if (isSameSubset || isSameType) {
+                    continue;
+                }
+
+                pairs.push([images[i], images[j]]);
+            }
+        }
+
+        return shuffleArray(pairs);
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    showNextImagePair(); // Start the experiment
+
+
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progress-fill');
+        const completionPercentage = (currentPairIndex / shuffledPairs.length) * 100;
+        progressBar.style.width = `${completionPercentage}%`;
+    }
+
+    function recordPreference(selectedImageId) {
+        console.log(`Participant selected ${selectedImageId} as the more beautiful building`);
+
+        // Implement further logic based on your needs
+
+        currentPairIndex++;
+        updateProgressBar();
+
+        if (currentPairIndex >= shuffledPairs.length) {
+            alert('Experiment complete!');
+        } else {
+            showNextImagePair();
+        }
+    }
+
+</script>
+
+</body>
+</html>
+
